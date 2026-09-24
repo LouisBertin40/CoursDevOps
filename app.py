@@ -18,10 +18,14 @@ def sanitize_input(value):
 
 
 def get_redis_client():
-    """Cree et retourne un client Redis base sur les variables d'environnement."""
+    """Cree et retourne un client Redis."""
     redis_host = os.getenv("REDIS_HOST", "redis")
     redis_port = int(os.getenv("REDIS_PORT", 6379))
-    return redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+    return redis.Redis(
+        host=redis_host,
+        port=redis_port,
+        decode_responses=True
+    )
 
 
 @app.route("/health")
@@ -37,7 +41,10 @@ def health():
 
 @app.route("/status")
 def status():
-    return jsonify(service="projet-devops-groupe-demo", version="1.0"), 200
+    return jsonify(
+        service="projet-devops-groupe-demo",
+        version="1.0"
+    ), 200
 
 
 @app.route("/visits")

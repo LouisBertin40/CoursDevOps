@@ -1,6 +1,7 @@
-from app import alert_threshold, sanitize_input, app
 from unittest.mock import patch
+from app import alert_threshold, sanitize_input, app
 import redis
+
 
 def test_alert_threshold():
     assert alert_threshold() == 25
@@ -22,10 +23,13 @@ def test_health_endpoint_success():
 def test_health_endpoint_failure():
     client = app.test_client()
     with patch("app.get_redis_client") as mock_redis:
-        mock_redis.return_value.ping.side_effect = redis.ConnectionError("Connexion impossible")
+        mock_redis.return_value.ping.side_effect = redis.ConnectionError(
+            "Connexion impossible"
+        )
         response = client.get("/health")
         assert response.status_code == 503
         assert response.get_json()["status"] == "error"
+
 
 def test_status_endpoint():
     client = app.test_client()

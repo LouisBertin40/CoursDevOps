@@ -1,4 +1,6 @@
+import os
 from flask import Flask, jsonify
+import redis
 
 app = Flask(__name__)
 
@@ -15,17 +17,45 @@ def sanitize_input(value):
     return value.replace("<", "&lt;").replace(">", "&gt;")
 
 
+def get_redis_client():
+    """Cree et retourne un client Redis."""
+    redis_host = os.getenv("REDIS_HOST", "redis")
+    redis_port = int(os.getenv("REDIS_PORT", 6379))
+    return redis.Redis(
+        host=redis_host,
+        port=redis_port,
+        decode_responses=True
+    )
+
+
 @app.route("/health")
 def health():
-    return jsonify(status="ok"), 200
+    try:
+        r = get_redis_client()
+        if r.ping():
+            return jsonify(status="ok"), 200
+        return jsonify(status="error", details="Redis ping failed"), 503
+    except Exception as e:
+        return jsonify(status="error", details=str(e)), 503
 
 
 @app.route("/status")
 def status():
-    return jsonify(service="projet-devops-groupe-demo", version="1.0"), 200
+    return jsonify(
+        service="projet-devops-groupe-demo",
+        version="1.0"
+    ), 200
+
+
+@app.route("/visits")
+def visits():
+    try:
+        r = get_redis_client()
+        count = r.incr("visits_count")
+        return jsonify(visits=count), 200
+    except redis.ConnectionError:
+        return jsonify(error="Impossible de se connecter a Redis"), 503
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-# Test trigger PR
+    app.run(host="0.0.0.0", port=5000, debug=True)

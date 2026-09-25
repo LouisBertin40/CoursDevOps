@@ -59,13 +59,5 @@ def visits():
         return jsonify(error="Impossible de se connecter a Redis"), 503
 
 
-@app.route("/")
-def index():
-    return jsonify({
-        "message": "Bienvenue sur l'application DevOps ! (v2.0.0)",
-        "status": "running"
-    }), 200
-
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

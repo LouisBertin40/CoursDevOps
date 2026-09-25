@@ -27,12 +27,6 @@ def get_redis_client():
         decode_responses=True
     )
 
-@app.route("/")
-def index():
-    return jsonify({
-        "message": "Bienvenue sur l'application DevOps ! (v2.0.0)",
-        "status": "running"
-    }), 200
 
 @app.route("/health")
 def health():
@@ -63,6 +57,14 @@ def visits():
         return jsonify(visits=count), 200
     except redis.ConnectionError:
         return jsonify(error="Impossible de se connecter a Redis"), 503
+
+
+@app.route("/")
+def index():
+    return jsonify({
+        "message": "Bienvenue sur l'application DevOps ! (v2.0.0)",
+        "status": "running"
+    }), 200
 
 
 if __name__ == "__main__":

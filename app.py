@@ -27,6 +27,12 @@ def get_redis_client():
         decode_responses=True
     )
 
+@app.route("/")
+def index():
+    return jsonify({
+        "message": "Bienvenue sur l'application DevOps ! (v2.0.0)",
+        "status": "running"
+    }), 200
 
 @app.route("/health")
 def health():
